@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://khahusconsulting.com.ng/sitemap.xml

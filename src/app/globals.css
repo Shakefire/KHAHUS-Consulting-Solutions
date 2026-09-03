@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+@theme {
+  --color-khahusRed: #B9111F;
+  --color-khahusRedDark: #8B0D1B;
+  --color-khahusGold: #F2A23D;
+  --color-khahusOrange: #F6B35B;
+  --color-khahusNavy: #1E2D5B;
+  --color-khahusCharcoal: #111111;
+  --color-khahusSlate: #4A5368;
+  --color-khahusMist: #F6F3EE;
+}
+
+@layer utilities {
+  .nav-link-hover {
+    @apply relative overflow-hidden;
+  }
+  .nav-link-hover::after {
+    @apply content-[''] absolute bottom-0 left-0 w-full h-[2px] bg-khahusRed -translate-x-full transition-transform duration-300;
+  }
+  .nav-link-hover:hover::after {
+    @apply translate-x-0;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes slide-up {
+    from { 
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse-subtle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  .animate-pulse-subtle {
+    animation: pulse-subtle 4s ease-in-out infinite;
+  }
+
+  .delay-150 { animation-delay: 150ms; }
+  .delay-300 { animation-delay: 300ms; }
+
+  @keyframes expand-width {
+    from { width: 0; opacity: 0; }
+    to { width: 6rem; opacity: 1; }
+  }
+
+  @keyframes pulsate-line {
+    0%, 100% { 
+      transform: scaleX(1);
+      box-shadow: 0 0 0 rgba(242, 162, 61, 0);
+    }
+    50% { 
+      transform: scaleX(1.1);
+      box-shadow: 0 0 12px rgba(242, 162, 61, 0.8);
+    }
+  }
+
+  @keyframes shimmer-sweep {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .animate-premium-line {
+    background: linear-gradient(
+      90deg,
+      #1E2D5B 0%,
+      #F2A23D 38%,
+      #F6F3EE 50%,
+      #F2A23D 62%,
+      #1E2D5B 100%
+    );
+    background-size: 200% 100%;
+    /* Combine: Expand (1s), Pulse (infinite), Shimmer (infinite) */
+    animation: 
+      expand-width 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+      pulsate-line 2.5s ease-in-out infinite 1.2s,
+      shimmer-sweep 3s linear infinite 1.2s;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #ffffff;
+  color: var(--color-khahusCharcoal);
+  font-family: var(--font-inter), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

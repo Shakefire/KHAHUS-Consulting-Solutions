@@ -1,0 +1,377 @@
+"use client";
+
+import React, { useState, useEffect, useMemo } from "react";
+
+const CONTACT_API_URL = "https://khahusmailapi.vercel.app/api/contact";
+
+export default function ContactSection() {
+    const [mounted, setMounted] = useState(false);
+    const [formData, setFormData] = useState({
+        fullName: "",
+        email: "",
+        phone: "",
+        company: "",
+        service: "",
+        message: ""
+    });
+    const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+    const [errorMessage, setErrorMessage] = useState("");
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Memoize particles to satisfy React purity rules
+    const particles = useMemo(() => {
+        return [...Array(50)].map((_, i) => ({
+            id: i,
+            r: Math.random() * 3 + 1.5,
+            cx: [`${Math.random() * 100}%`, `${Math.random() * 100}%`, `${Math.random() * 100}%`, `${Math.random() * 100}%`],
+            cy: [`${Math.random() * 100}%`, `${Math.random() * 100}%`, `${Math.random() * 100}%`, `${Math.random() * 100}%`],
+            dur: `${Math.random() * 30 + 30}s`,
+            opacityDur: `${Math.random() * 10 + 10}s`,
+            opacity: Math.random() * 0.3 + 0.1
+        }));
+    }, []);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { id, value } = e.target;
+        setFormData(prev => ({ ...prev, [id]: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setStatus("loading");
+        setErrorMessage("");
+
+        try {
+            const response = await fetch(CONTACT_API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+
+            const responseText = await response.text();
+            let result: { error?: string; data?: { error?: string } } = {};
+
+            try {
+                result = responseText ? JSON.parse(responseText) : {};
+            } catch {
+                result = { error: "The email service returned an invalid response." };
+            }
+
+            if (response.ok) {
+                setStatus("success");
+                setFormData({
+                    fullName: "",
+                    email: "",
+                    phone: "",
+                    company: "",
+                    service: "",
+                    message: ""
+                });
+            } else {
+                setStatus("error");
+                const msg = result.data?.error || result.error || "Something went wrong. Please try again.";
+                setErrorMessage(msg);
+            }
+        } catch (err: any) {
+            setStatus("error");
+            const fallbackMsg = "Failed to send message. Please check your connection.";
+            setErrorMessage(fallbackMsg);
+            alert(fallbackMsg);
+        }
+    };
+
+    return (
+        <section className="relative py-24 bg-khahusMist overflow-hidden" id="contact">
+            {/* Background Animation */}
+            <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
+                <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                    {mounted && particles.map((p) => (
+                        <circle
+                            key={p.id}
+                            r={p.r}
+                            fill="#C50C1A"
+                            opacity={p.opacity}
+                        >
+                            <animate
+                                attributeName="cx"
+                                values={p.cx.join(';')}
+                                dur={p.dur}
+                                repeatCount="indefinite"
+                            />
+                            <animate
+                                attributeName="cy"
+                                values={p.cy.join(';')}
+                                dur={p.dur}
+                                repeatCount="indefinite"
+                            />
+                            <animate
+                                attributeName="opacity"
+                                values="0;0.4;0.2;0.5;0"
+                                dur={p.opacityDur}
+                                repeatCount="indefinite"
+                            />
+                        </circle>
+                    ))}
+                </svg>
+            </div>
+
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center max-w-3xl mx-auto mb-16">
+                    <h2 className="text-3xl md:text-5xl font-extrabold text-khahusNavy mb-6 tracking-tight">
+                        Start Your Next Project With Us
+                    </h2>
+                    <p className="text-lg text-khahusSlate font-medium">
+                        Speak with our experts about management consulting, professional training, technology solutions, infrastructure deployment, cybersecurity, or procurement services for your organization.
+                    </p>
+                </div>
+
+                <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch">
+                    {/* Left Column: Contact Details */}
+                    <div className="w-full lg:w-1/3 flex flex-col gap-8">
+                        {/* Contact Details Card */}
+                        <div className="bg-white/80 backdrop-blur-md p-8 rounded-3xl border border-khahusNavy/10 shadow-xl relative overflow-hidden group flex-grow">
+                            <div className="space-y-8 relative z-10">
+                                <div className="flex items-start">
+                                    <div className="flex-shrink-0 mt-1 bg-khahusRed/10 p-3 rounded-xl text-khahusRed">
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div className="ml-5">
+                                        <h4 className="text-khahusCharcoal font-bold mb-1">Office Address</h4>
+                                        <div className="space-y-3">
+                                            <div>
+                                                <p className="text-khahusRed text-xs font-bold uppercase tracking-wider mb-0.5">Abuja Office</p>
+                                                <p className="text-khahusSlate text-sm leading-relaxed">Plot 202H, Mustapha Babareke Street, Mountain View Estate, Dawaki, Abuja.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start">
+                                    <div className="flex-shrink-0 mt-1 bg-khahusRed/10 p-3 rounded-xl text-khahusRed">
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                        </svg>
+                                    </div>
+                                    <div className="ml-5">
+                                        <h4 className="text-khahusCharcoal font-bold mb-1">Phone</h4>
+                                        <p className="text-gray-600 block hover:text-khahusRed transition">08035926194</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start">
+                                    <div className="flex-shrink-0 mt-1 bg-khahusRed/10 p-3 rounded-xl text-khahusRed">
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <div className="ml-5">
+                                        <h4 className="text-khahusCharcoal font-bold mb-1">Email</h4>
+                                        <a href="mailto:info@khahusconsulting.com.ng" className="text-gray-600 hover:text-khahusRed transition group block text-sm">
+                                            <span className="border-b border-transparent group-hover:border-khahusRed pb-0.5 whitespace-nowrap">
+                                                info@khahusconsulting.com.ng
+                                            </span>
+                                        </a>
+                                        <a href="mailto:support@khahusconsulting.com.ng" className="text-gray-600 hover:text-khahusRed transition group block text-sm mt-2">
+                                            <span className="border-b border-transparent group-hover:border-khahusRed pb-0.5 whitespace-nowrap">
+                                                support@khahusconsulting.com.ng
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-khahusRed/5 rounded-full blur-3xl group-hover:bg-khahusRed/10 transition-colors duration-500"></div>
+                        </div>
+
+                        {/* Trust Indicators */}
+                        <div className="bg-white/50 border border-khahusNavy/10 rounded-3xl p-8 space-y-4">
+                            <div className="flex items-center text-sm text-khahusCharcoal font-medium">
+                                <div className="w-6 h-6 rounded-full bg-khahusGold/20 flex items-center justify-center mr-3">
+                                    <svg className="w-4 h-4 text-khahusNavy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                Response within 24 hours
+                            </div>
+                            <div className="flex items-center text-sm text-khahusCharcoal font-medium">
+                                <div className="w-6 h-6 rounded-full bg-khahusGold/20 flex items-center justify-center mr-3">
+                                    <svg className="w-4 h-4 text-khahusNavy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                Free consultation available
+                            </div>
+                            <div className="flex items-center text-sm text-khahusCharcoal font-medium">
+                                <div className="w-6 h-6 rounded-full bg-khahusGold/20 flex items-center justify-center mr-3">
+                                    <svg className="w-4 h-4 text-khahusNavy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                Confidentiality guaranteed
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right Column: Contact Form */}
+                    <div className="w-full lg:w-2/3 bg-white/40 backdrop-blur-xl p-8 md:p-12 rounded-3xl shadow-2xl border border-white/20 relative">
+                        {status === "success" ? (
+                            <div className="h-full flex flex-col items-center justify-center text-center py-12">
+                                <div className="w-20 h-20 bg-khahusGold/20 text-khahusNavy rounded-full flex items-center justify-center mb-6">
+                                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                <h3 className="text-2xl font-bold text-khahusCharcoal mb-4">Message Sent Successfully!</h3>
+                                <p className="text-khahusSlate mb-8 max-w-sm mx-auto">
+                                    Thank you for reaching out. Our team will review your request and get back to you within 24 hours.
+                                </p>
+                                <button
+                                    onClick={() => setStatus("idle")}
+                                    className="text-khahusRed font-bold hover:underline"
+                                >
+                                    Send another message
+                                </button>
+                            </div>
+                        ) : (
+                            <form className="space-y-6" onSubmit={handleSubmit}>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label htmlFor="fullName" className="block text-sm font-semibold text-khahusCharcoal mb-2">
+                                            Full Name <span className="text-khahusRed">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="fullName"
+                                            value={formData.fullName}
+                                            onChange={handleChange}
+                                            className="w-full px-5 py-4 bg-white/50 backdrop-blur-sm rounded-xl border border-khahusNavy/15 text-khahusCharcoal placeholder-khahusSlate focus:ring-2 focus:ring-khahusRed focus:border-transparent transition outline-none"
+                                            placeholder="John Doe"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="email" className="block text-sm font-semibold text-khahusCharcoal mb-2">
+                                            Email Address <span className="text-khahusRed">*</span>
+                                        </label>
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            className="w-full px-5 py-4 bg-white/50 backdrop-blur-sm rounded-xl border border-khahusNavy/15 text-khahusCharcoal placeholder-khahusSlate focus:ring-2 focus:ring-khahusRed focus:border-transparent transition outline-none"
+                                            placeholder="john@example.com"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label htmlFor="phone" className="block text-sm font-semibold text-khahusCharcoal mb-2">
+                                            Phone Number
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            id="phone"
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                            className="w-full px-5 py-4 bg-white/50 backdrop-blur-sm rounded-xl border border-khahusNavy/15 text-khahusCharcoal placeholder-khahusSlate focus:ring-2 focus:ring-khahusRed focus:border-transparent transition outline-none"
+                                            placeholder="+234 ..."
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="company" className="block text-sm font-semibold text-khahusCharcoal mb-2">
+                                            Organization / Company
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="company"
+                                            value={formData.company}
+                                            onChange={handleChange}
+                                            className="w-full px-5 py-4 bg-white/50 backdrop-blur-sm rounded-xl border border-khahusNavy/15 text-khahusCharcoal placeholder-khahusSlate focus:ring-2 focus:ring-khahusRed focus:border-transparent transition outline-none"
+                                            placeholder="Your Company Ltd"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label htmlFor="service" className="block text-sm font-semibold text-khahusCharcoal mb-2">
+                                        Service of Interest <span className="text-khahusRed">*</span>
+                                    </label>
+                                    <div className="relative">
+                                        <select
+                                            id="service"
+                                            value={formData.service}
+                                            onChange={handleChange}
+                                            className="w-full px-5 py-4 bg-white/50 backdrop-blur-sm rounded-xl border border-khahusNavy/15 text-khahusCharcoal focus:ring-2 focus:ring-khahusRed focus:border-transparent transition outline-none appearance-none [&>option]:text-khahusCharcoal"
+                                            required
+                                        >
+                                            <option value="" disabled>Select a service...</option>
+                                            <option value="Management Consulting">Management Consulting</option>
+                                            <option value="Strategic Planning & Business Advisory">Strategic Planning & Business Advisory</option>
+                                            <option value="Professional Training & Capacity Building">Professional Training & Capacity Building</option>
+                                            <option value="Organizational Development">Organizational Development</option>
+                                            <option value="Procurement & Supply Services">Procurement & Supply Services</option>
+                                            <option value="Technology Solutions & Digital Advisory">Technology Solutions & Digital Advisory</option>
+                                            <option value="ICT Infrastructure Support">ICT Infrastructure Support</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-khahusSlate">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label htmlFor="message" className="block text-sm font-semibold text-khahusCharcoal mb-2">
+                                        Message <span className="text-khahusRed">*</span>
+                                    </label>
+                                    <textarea
+                                        id="message"
+                                        rows={5}
+                                        value={formData.message}
+                                        onChange={handleChange}
+                                        className="w-full px-5 py-4 bg-white/50 backdrop-blur-sm rounded-xl border border-khahusNavy/15 text-khahusCharcoal placeholder-khahusSlate focus:ring-2 focus:ring-khahusRed focus:border-transparent transition outline-none resize-y"
+                                        placeholder="Tell us about your project..."
+                                        required
+                                    ></textarea>
+                                </div>
+
+                                {status === "error" && (
+                                    <div className="p-4 bg-khahusRed/5 border border-khahusRed/20 text-khahusRed text-sm rounded-xl">
+                                        {errorMessage}
+                                    </div>
+                                )}
+
+                                <div className="pt-4">
+                                    <button
+                                        type="submit"
+                                        disabled={status === "loading"}
+                                        className="w-full px-8 py-5 bg-khahusRed hover:bg-khahusRedDark disabled:bg-khahusSlate text-white font-bold text-lg rounded-xl shadow-[0_4px_14px_0_rgba(197,12,26,0.35)] hover:shadow-[0_6px_25px_rgba(197,12,26,0.4)] transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center"
+                                    >
+                                        {status === "loading" ? (
+                                            <>
+                                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Processing...
+                                            </>
+                                        ) : "Request Consultation"}
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
