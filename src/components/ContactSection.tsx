@@ -146,7 +146,7 @@ export default function ContactSection() {
                                         <div className="space-y-3">
                                             <div>
                                                 <p className="text-khahusRed text-xs font-bold uppercase tracking-wider mb-0.5">Abuja Office</p>
-                                                <p className="text-khahusSlate text-sm leading-relaxed">Plot 202H, Mustapha Babareke Street, Mountain View Estate, Dawaki, Abuja.</p>
+                                                <p className="text-khahusSlate text-sm leading-relaxed">Suite C05, No. 35 , Ajose Adeogun Street Street, Utako District Abuja</p>
                                             </div>
                                         </div>
                                     </div>

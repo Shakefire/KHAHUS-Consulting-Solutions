@@ -69,7 +69,7 @@ export default function Footer() {
                                 <svg className="w-5 h-5 text-khahusRed mr-3 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                 <div className="space-y-2">
                                     <p className="text-xs text-khahusGold font-bold uppercase tracking-widest">Abuja Office</p>
-                                    <p className="text-xs leading-relaxed">Plot 202H, Mustapha Babareke Street, Mountain View Estate, Dawaki, Abuja.</p>
+                                    <p className="text-xs leading-relaxed">Suite C05, No. 35 , Ajose Adeogun Street Street, Utako District Abuja</p>
                                 </div>
                             </li>
                             <li className="flex items-center">
